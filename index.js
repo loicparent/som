@@ -1,7 +1,7 @@
 /* sòm
  * Compute checksum of a file.
  *
- * started at 24/08/2015
+ * started at 25/09/2015
  */
 
 "use strict";
@@ -14,31 +14,42 @@ var chalk = require( "chalk" ),
 
 var sFileName, sFilePath;
 
-var fError = function( sErrorMessage ) {
+var fShowError = function( sErrorMessage ) {
     console.log( chalk.red.bold.underline( "✘ error:" ), sErrorMessage );
     process.exit( 1 );
 };
 
-// check argument
 if( !( sFileName = process.argv[ 2 ] ) ) {
-    fError( "You need to give a file as argument!" );
+    fShowError( "You need to give a file as argument!" );
 }
 
-fs.stat( ( sFilePath = path.resolve( process.cwd(), sFileName ) ), function( oError, oFileStats ) {
+sFilePath = path.resolve( process.cwd(), sFileName );
+
+fs.stat( sFilePath, function( oError, oStats ) {
     var aLogLines = [];
 
     if( oError ) {
-        fError( oError.message );
+        fShowError( oError.message );
+    }
+
+    if( !oStats.isFile() ) {
+        fShowError( "The given path must be a file!" );
     }
 
     // name
     aLogLines.push( chalk.yellow.bold( sFileName ) );
 
     // size
-    aLogLines.push( chalk.gray( "(" + humanSize( oFileStats.size ) + ")" ) );
+    aLogLines.push( chalk.gray( "(" + humanSize( oStats.size ) + ")" ) );
 
-    // sum
-    aLogLines.push( chalk.green.bold( "sum:" ) + " " + crc32( fs.readFileSync( sFilePath, { "encoding": "utf-8" } ) ) );
+    // checksum
+    fs.readFile( sFilePath, { "encoding": "utf-8" }, function( oError, sData ) {
+        if( oError ) {
+            fShowError( oError );
+        }
 
-    console.log( aLogLines.join( " " ) );
+        aLogLines.push( chalk.green.bold( "sum:" ) + " " + crc32( sData ) );
+
+        console.log( aLogLines.join( " " ) );
+    } );
 } );
