@@ -10,7 +10,8 @@ var chalk = require( "chalk" ),
     path = require( "path" ),
     fs = require( "fs" ),
     humanSize = require( "human-size" ),
-    crc32 = require( "easy-crc32" ).calculate;
+    crc32 = require( "easy-crc32" ).calculate,
+    MD5 = require( "MD5" );
 
 var sFileName, sFilePath;
 
@@ -48,7 +49,7 @@ fs.stat( sFilePath, function( oError, oStats ) {
             fShowError( oError );
         }
 
-        aLogLines.push( chalk.green.bold( "sum:" ) + " " + crc32( sData ) );
+        aLogLines.push( chalk.green.bold( "sum:" ) + " " + MD5( sData ) );
 
         console.log( aLogLines.join( " " ) );
     } );
