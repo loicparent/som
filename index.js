@@ -2,6 +2,8 @@
  * Compute checksum of a file.
  *
  * started at 25/09/2015
+ *
+ * Change the hashing function from crc-32 to MD5.
  */
 
 "use strict";
